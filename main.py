@@ -21,14 +21,15 @@ st.title('Fuzzy Logic Implementasi')
 out_name_a=[]
 var_name_a=[]
 sat_name_a=[] 
-himp_num_a=[] 
 def himp(e,r):
-    co1, co2, co3 = st.beta_columns([.7,.7,.7])
+    co1, co2, co3, co4 = st.beta_columns([.5,.5,.5,.5])
+    himp_num_a=[] 
     for i in range(int(e)):
-        istilah_name = co1.text_input('Nama Istilah '+str(r)+str(i+1))
-        nilai_min = co2.number_input('nilai '+str(r)+str(i+1))
-        himp_num_a.append((istilah_name,nilai_min))
-
+        nilai_min = co1.number_input('Nilai Minimum '+str(r)+' '+str(i+1), min_value=0)
+        istilah_min = co2.text_input('Istilah Minimum '+str(r)+' '+str(i+1))
+        nilai_max = co3.number_input('Nilai Maximum '+str(r)+' '+str(i+1), min_value=0)
+        istilah_max = co4.text_input('Istilah Maximum '+str(r)+' '+str(i+1))
+        himp_num_a.append(((nilai_min,istilah_min),(nilai_max,istilah_max)))
     return himp_num_a
 
 var_number = st.number_input('Masukan jumlah Variabel', min_value=0, max_value=10)
@@ -39,16 +40,22 @@ for i in range(int(var_number)):
     sat_name = col3.text_input('Satuan '+str(i+1))
     himp_num = col4.number_input('Masukan Jumlah Himpunan '+str(i+1), min_value=0, max_value=10)
     a = himp(himp_num, var_name)
-    out_name_a.append(((out_name, var_name, sat_name,a)))
+    out_name_a.append(((out_name, var_name, sat_name, a)))
    
     # var_name_a.append((out_name_a[i], himp(himp_num)))
     # sat_name_a.append(sat_name)
     # b = var_name_a.append(himp_num)
     # himp(b,a)
-    
+
+rule_num = st.number_input('Masukan jumlah rules', min_value=0, max_value=10)
+for i in range(int(rule_num)):
+    out_name = col1.selectbox('Jika '+str(i+1),(i[1]))
+
 out_name_ab = np.array([out_name_a])  
 col1.write('Tabel Tipe Variabel')
 st.write(out_name_a)
+for i in out_name_a:    
+    st.write(i[1])
 # var_name_ab = np.array([var_name_a])  
 # col2.write('Tabel Variabel Name')
 # col2.write(var_name_a)
