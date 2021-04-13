@@ -8,14 +8,13 @@ st.title('Fuzzy Logic Implementasi')
 out_name_a=[]
 var_name_a=[]
 sat_name_a=[] 
-jika1_name=[] 
-jika2_name=[] 
 min_val=[] 
 max_val=[] 
 min_name=[] 
 max_name=[] 
-op_fuz = []
-# op_fuz2 = []
+fuz = []
+imp = []
+kom = []
 def himp(e,r):
     co1, co2, co3, co4 = st.beta_columns([.5,.5,.5,.5])
     nilai_min = 0
@@ -31,14 +30,25 @@ def himp(e,r):
 
 
 def get(a):
+    jika1_name=[] 
     for i in a[0]:    
         jika1_name.append((i[0],i[1],i[2]))
     return jika1_name
 
 def get2(a):
+    jika2_name=[] 
     for i in a[1]:    
         jika2_name.append(i)
     return jika2_name
+
+def get3(a):
+    jika3_name=[] 
+    for i in a:
+        for j in i[4]:
+            if 'Output' in i[0]:
+                jika3_name.append(j[1])
+    return jika3_name
+
 
 def calc_fuzz1(e, f, g):
     res = 0
@@ -52,7 +62,26 @@ def calc_fuzz2(e, f, g):
         res = (e[i]-g[i])/(f[i]-g[i])
     return res
 
+def fuzzy(a, b):
+    fuzzy = []
+    bn = [a,b]
+    return min(bn)
 
+def min_kom(a, b):
+    komp_atu = []
+    # for i in b:
+    for j in range(len(b)):
+        if b[j][2] in a:
+            komp_atu.append(b[j][1])
+    return (a,min(komp_atu))
+
+def max_kom(a, b):
+    komp_atu = []
+    # for i in b:
+    for j in range(len(b)):
+        if b[j][2] in a:
+            komp_atu.append(b[j][1])        
+    return (a,max(komp_atu))
 
 var_number = st.number_input('Masukan jumlah Variabel', min_value=0, max_value=10)
 col1, col2, col3, col4,col5 = st.beta_columns([.5,.5,.5,.5,.5])
@@ -72,20 +101,26 @@ for i in out_name_a:
         min_rul = i[1],(i[4][0][1]),(calc_fuzz1([i[3]],[i[4][1][0]],[i[4][0][0]]))
         st.text(str(i[4][1][1])+': '+str(calc_fuzz2([i[3]],[i[4][1][0]],[i[4][0][0]])))
         max_rul = i[1],(i[4][1][1]),(calc_fuzz2([i[3]],[i[4][1][0]],[i[4][0][0]]))
-        op_fuz.append((min_rul, max_rul))
+        fuz.append((min_rul, max_rul))
 # st.write(op_fuz[0])
-   
-# st.write(get(op_fuz))
-# st.write(get2(op_fuz))
-# st.text(str(get(op_fuz)))
 
 rule_num = st.number_input('Masukan jumlah rules', min_value=0, max_value=10)
 for i in range (int(rule_num)):
+    rule = st.text('[R'+str(i+1)+']')
     c1, c2, c3 = st.beta_columns([1,1,1])
-    jika1 = c1.selectbox('Jika Variabel '+str(i+1),get(op_fuz))
-    dan1 = c2.selectbox('Dan Variabel '+str(i+1),get2(op_fuz))
-    # maka1 = c3.selectbox('Maka Variabel '+str(i+1),get(out_name_a))
+    jika1 = c1.selectbox('Jika Variabel '+str(i+1),get(fuz))
+    dan1 = c2.selectbox('Dan Variabel '+str(i+1),get2(fuz))
+    maka1 = c3.selectbox('Maka Variabel '+str(i+1),get3(out_name_a))
+    imp.append(('[R'+str(i+1)+']', fuzzy(jika1[2],dan1[2]), maka1))
 
+for i in out_name_a:
+    if 'Output' in i[0]:
+        min_kom = min_kom((i[4][0][1]), imp)
+        # st.write(min_kom)
+        max_kom = max_kom((i[4][1][1]),imp)
+        # st.write(max_kom)
+        kom.append((min_kom, max_kom))
 
-# st.write(out_name_a)
-   
+st.write(kom)     
+st.write(imp)   
+st.write(out_name_a)   
