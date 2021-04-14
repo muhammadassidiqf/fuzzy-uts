@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 
 st.set_page_config(layout="wide")
 st.title('Fuzzy Logic Implementasi')
@@ -16,6 +15,8 @@ try:
     fuz = []
     imp = []
     kom = []
+    rand = []
+    rand2 = []
     def himp(e,r):
         co1, co2, co3, co4 = st.beta_columns([.5,.5,.5,.5])
         nilai_min = 0
@@ -64,13 +65,11 @@ try:
         return res
 
     def fuzzy(a, b):
-        fuzzy = []
         bn = [a,b]
         return min(bn)
 
     def min_kom(a, b):
         komp_atu = []
-        # for i in b:
         for j in range(len(b)):
             if b[j][2] in a:
                 komp_atu.append(b[j][1])
@@ -78,11 +77,18 @@ try:
 
     def max_kom(a, b):
         komp_atu = []
-        # for i in b:
         for j in range(len(b)):
             if b[j][2] in a:
                 komp_atu.append(b[j][1])        
         return max(komp_atu)
+
+    def find_sum(d):
+        res = 0
+
+        for i in range(len(d)):
+            res += d[i]
+        
+        return res
 
     with st.beta_expander("Inisialisasi Variabel dan Data"):
         var_number = st.number_input('Masukan jumlah Variabel', min_value=0, max_value=10)
@@ -105,8 +111,8 @@ try:
                 st.text(str(i[4][1][1])+': '+str(calc_fuzz2([i[3]],[i[4][1][0]],[i[4][0][0]])))
                 max_rul = i[1],(i[4][1][1]),(calc_fuzz2([i[3]],[i[4][1][0]],[i[4][0][0]]))
                 fuz.append((min_rul, max_rul))  
-    # st.write(op_fuz[0])
-    with st.beta_expander("Rules dan Implikasi"):
+
+    with st.beta_expander("Rules"):
         rule_num = st.number_input('Masukan jumlah rules', min_value=0, max_value=10)
         for i in range (int(rule_num)):
             rule = st.text('[R'+str(i+1)+']')
@@ -115,24 +121,45 @@ try:
             dan1 = c2.selectbox('Dan Variabel '+str(i+1),get2(fuz))
             maka1 = c3.selectbox('Maka Variabel '+str(i+1),get3(out_name_a))
             imp.append(('[R'+str(i+1)+']', fuzzy(jika1[2],dan1[2]), maka1))
-        st.write(imp)
+    
+    with st.beta_expander("Implikasi"):
+        im = pd.DataFrame(imp)
+        st.write(im)
+
     with st.beta_expander("Komposisi Aturan"):
         for i in out_name_a:
             if 'Output' in i[0]:
                 min_kom = min_kom((i[4][0][1]), imp)
-                # st.write(min_kom)
                 max_kom = max_kom((i[4][1][1]),imp)
-                # st.write(max_kom)
-                kom.append((min_kom, max_kom))
+                kom.append(((i[4][0][1],min_kom), (i[4][1][1],max_kom)))
                 st.text(str(i[4][0][1])+': '+str(min_kom))
                 st.text(str(i[4][1][1])+': '+str(max_kom))
+
+    with st.beta_expander("Angka Random"):
+        colu1, colu2 = st.beta_columns([1,1])
+        var_number = colu1.number_input('Masukan jumlah angka random '+str(kom[0][0][0]), min_value=0)
+        var_number2 = colu2.number_input('Masukan jumlah angka random '+str(kom[0][1][0]), min_value=0)
+        for i in range(int(var_number)):
+            for j in out_name_a:
+                if 'Output' in j[0]:
+                    rand_num = colu1.number_input('Masukan angka random '+str(kom[0][0][0])+' '+str(i+1), min_value=j[4][0][0], max_value=j[4][1][0])
+                    rand.append(rand_num)
+
+        for i in range(int(var_number2)):
+            for j in out_name_a:
+                if 'Output' in j[0]:
+                    rand_num = colu2.number_input('Masukan angka random '+str(kom[0][1][0])+' '+str(i+1), min_value=j[4][0][0], max_value=j[4][1][0])
+                    rand2.append(rand_num)
+
+    with st.beta_expander("Defuzzifikasi"):
+        defuz = round((((find_sum(rand)*kom[0][0][1])+(find_sum(rand2)*kom[0][1][1]))/((len(rand)*kom[0][0][1])+(len(rand2)*kom[0][1][1]))),3)
+        st.text('Hasil Defuzzifikasi= '+str(defuz))
+        for i in out_name_a:
+                if 'Output' in i[0]:
+                    st.text('Jadi '+str(i[1])+' yang diperlukan adalah '+str(defuz))
+
 except ZeroDivisionError:
-  # Prevent the error from propagating into your Streamlit app.
     pass
 
 except ValueError:
     pass
-
-    # st.write(kom)     
-# st.write(imp)   
-# st.write(out_name_a)   
