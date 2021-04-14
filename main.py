@@ -163,3 +163,6 @@ except ZeroDivisionError:
 
 except ValueError:
     pass
+
+except IndexError:
+    pass
